@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>Mydemo - 新建</title>
+${include("/ibp/httl/include/include_css.httl","UTF-8")}
+${include("/ibp/httl/include/include_js.httl","UTF-8")}
+
+</head>
+
+
+<body>
+	<cus-template>
+	<div class="clearfix">
+
+		<form class="cus-form">
+
+			<div layout="row" class="form-box">
+				<div flex layout="row" layout-wrap layout-padding class="form-boxin">
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>ID: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="id"
+								required>
+						</div>
+					</div>
+
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>Username: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="username"
+								required>
+						</div>
+					</div>
+
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>Password: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="password"
+								required>
+						</div>
+					</div>
+
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>Phone: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="phone"
+								required>
+						</div>
+					</div>
+
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>Address: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="address"
+								required>
+						</div>
+					</div>
+
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>Flag: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="flag"
+								required>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<input type="hidden" name="businesskey" id="businesskey"
+				value="${businesskey}" /> <input type="hidden"
+				name="businesskey_attachtype" id="businesskey_attachtype"
+				value="mydemo" /> <input type="hidden" name=" attachSize "
+				id="attachSize" value="5" /> <input type="hidden"
+				name=" attachFormat " id="attachFormat" value="txt,docx,xlsx" />
+			<div class="form-actions text-right">
+				<button class="btn btn-success form-btn" type="submit ">
+					<i class="fi fi-save"></i> 保存
+				</button>
+				<button class="btn btn-default form-btn" type="button"
+					onclick="resetButton()">
+					<i class="fi fi-previous-circle-o"></i> 重填
+				</button>
+			</div>
+		</form>
+	</div>
+	</cus-template>
+	${include("/ibp/httl/attach/include_attach.httl","UTF-8")}
+	<script cus-template-script>
+		var validate = $(".cus-form").validate({
+
+			submitHandler : function(form) {
+
+				$.ajax({
+					url : '${appName}/mydemo/insertMydemoSave.ajax',
+					data : $(form).serializeArray(),
+					type : 'post',
+					dataType : 'json',
+					success : function(data) {
+						if ("1" == data.messageFlag) {
+							layer.alert('保存成功');
+// 							saveT01_attachmentAllDo(data.businesskey);
+// 							var popLayerWindow = getPopLayerWindow();
+// 							popLayerWindow.popLayer.remove();
+ 							popLayerWindow.queryDataList();
+// 							popLayerWindow.successMsg(data.message);
+						} else {
+							layer.alert(data.message);
+						}
+					}
+				});
+			}
+		});
+	</script>
+</body>
+
+</html>
