@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>Mydemo - 修改</title>
+${include("/ibp/httl/include/include_css.httl","UTF-8")}
+${include("/ibp/httl/include/include_js.httl","UTF-8")}
+
+</head>
+
+
+<body>
+	<cus-template>
+	<div class="clearfix">
+
+		<form class="cus-form">
+
+			<div layout="row" class="form-box">
+				<div flex layout="row" layout-wrap layout-padding class="form-boxin">
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>ID: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="id"
+								readonly required>
+						</div>
+					</div>
+
+					<div class="form-item important" flex="100" flex-gt-sm="100"
+						flex-sm="100">
+						<label>问题词条：</label>
+						<div flex>
+							<input type="text" class="form-control input-sm" id="username"
+								name="username" readonly autocomplete="off" required>
+						</div>
+					</div>
+
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>Password: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="password"
+								id="password" required>
+						</div>
+					</div>
+
+					
+					<div class="form-item file important" flex="100" flex-gt-sm="100">
+						<label>Address: </label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="address"
+								required>
+						</div>
+					</div>
+					
+					
+					<div class="form-item date important" flex="100" flex-gt-sm="50"
+						flex-sm="50">
+						<label>创建日期</label>
+						<div flex>
+							<input type="text" class="form-control input-sm" name="phone"
+								readonly ui-daterangepicker required>
+						</div>
+					</div>
+					
+					
+					<div class="form-item important" flex="100" flex-gt-sm="40"
+						flex-sm="50">
+						<label>Flag_disp</label>
+						<div flex>
+							<select ui-select2 class="form-control input-sm" name="flag"
+								required> $!{flagMap}
+							</select>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<input type="hidden" name="businesskey" id="businesskey"
+				value="${businesskey}" /> <input type="hidden"
+				name="businesskey_attachtype" id="businesskey_attachtype"
+				value="mydemo" /> <input type="hidden" name=" attachSize "
+				id="attachSize" value="5" />
+			<div class="form-actions text-right">
+				<button class="btn btn-success form-btn" type="submit ">
+					<i class="fi fi-save"></i> 保存
+				</button>
+				
+				<!-- <button class="btn btn-default form-btn" type="button"
+					onclick="resetButton()">
+					<i class="fi fi-previous-circle-o"></i> 重填
+				</button> -->
+			</div>
+		</form>
+	</div>
+	</cus-template>
+	${include("/ibp/httl/attach/include_attach.httl","UTF-8")}
+	<script cus-template-script>
+			
+				
+    			//表单回填
+				var mydemo = $!{mydemoDTO.encodeJson};
+				$(".cus-form").setForm(mydemo);
+				$(function() {
+					<!-- 树定位 -->
+	    			//问题词条单选 
+	    			dropdownTree({menuid:'question_tree',type:'radio',localset:'username',width:300,height:400});
+				});
+				
+			
+							
+            var validate =  $(".cus-form").validate({
+            	
+                            submitHandler: function(form) {
+                            	if (($("#password").val().length) < 6) {
+                					alert("密码必须为大于6位！");
+                					return;
+                				} else {
+                					 $.ajax({
+                				    		url:'${appName}/mydemo/modifyMydemoDo.ajax',
+                				    		data:$(form).serializeArray(),
+                				    		type:'post',
+                				    		dataType:'json',
+                				    		success:function(data){
+                				    			if("1" == data.messageFlag){
+                				    				layer.alert('保存成功');
+                				    				saveT01_attachmentAllDo(data.businesskey);
+                				    				var popLayerWindow = getPopLayerWindow();
+                				    				popLayerWindow.popLayer.remove();
+                				    				popLayerWindow.queryDataList(); 
+                				    				popLayerWindow.successMsg(data.message);
+                				    			}else{
+                				    				layer.alert(data.message);
+                				    			}
+                				    		}
+                				    	});
+                				}           	                  
+                }
+            });
+		
+		</script>
+</body>
+
+</html>

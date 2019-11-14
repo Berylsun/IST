@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ibp.ioc.dao.mydemo.MydemoDAO">
+
+
+<select id="getMydemoList" 
+		parameterType="ibp.dto.mydemo.MydemoDTO" 
+		resultType="ibp.dto.mydemo.MydemoDTO">
+select
+			t.id,
+			t.username,
+			t.password,
+			t.phone,
+			t.address,
+			t.flag
+			from TEMP_T00_USERTEMP t where 1=1
+	<if test="id !='' and id != null">
+	and t.id =#{id} 
+	</if>
+	<if test="username !='' and username != null">
+	and t.username =#{username}  
+	</if>
+	<if test="password !='' and password != null">
+	and t.password =#{password}  
+	</if>
+	<if test="phone !='' and phone != null">
+	and t.phone =#{phone}  
+	</if>
+	<if test="address !='' and address != null">
+	and t.address =#{address}  
+	</if>
+	<if test="flag !='' and flag != null">
+	and t.flag =#{flag} 
+	</if>
+		
+</select>
+
+
+<insert id="insertMydemo" parameterType="ibp.dto.mydemo.MydemoDTO">
+insert into TEMP_T00_USERTEMP(
+		id,username,password,phone,address,flag
+		) 
+		values(
+		#{id},#{username},#{password},#{phone},#{address},#{flag}
+		) 
+
+</insert>
+
+
+<delete id="deleteMydemoById" parameterType="java.lang.String">
+        delete from TEMP_T00_USERTEMP where id=#{id}
+</delete>
+
+
+<update id="modifyMydemo" parameterType="ibp.dto.mydemo.MydemoDTO">
+update TEMP_T00_USERTEMP set
+		username=#{username},password=#{password},
+		phone=#{phone},address=#{address},flag=#{flag}
+		where id=#{id}
+</update>
+
+
+<select id="getMydemoDisp" parameterType="java.lang.String" resultType="ibp.dto.mydemo.MydemoDTO">
+select
+			t.id,
+			t.username,
+			t.password,
+			t.phone,
+			t.address,
+			t.flag
+			from TEMP_T00_USERTEMP t
+		where t.id=#{id} 
+</select>
+
+
+</mapper>

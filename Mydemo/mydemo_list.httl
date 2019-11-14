@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>Mydemo - 列表</title>
+${include("/ibp/httl/include/include_css.httl","UTF-8")}
+</head>
+
+<body>
+	<cus-template>
+	<div layout-fill>
+
+		<div class="panel-group cus-collapse box-shadow" id="accordion">
+			<div class="panel panel-default">
+				<div class="panel-heading" role="tab" id="headingOne">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-parent="#accordion"
+							href="#collapseOne" aria-expanded="true"> <i
+							class="fi fi-brush"></i> <span class="text">Mydemo - 列表</span>
+						</a>
+					</h4>
+				</div>
+				<div id="collapseOne" class="panel-collapse collapse in"
+					role="tabpanel">
+					<div class="panel-body">
+						<form class="cus-form" layout="row">
+							<div flex layout="row" flex-xs="100" layout-wrap layout-padding>
+
+								<div class="form-item" flex="40" flex-gt-sm="50"
+									flex-sm="100">
+									<label>问题词条：</label>
+									<div flex>
+										<input type="text" class="form-control input-sm" id="username"
+											name="username" readonly autocomplete="off">
+									</div>
+								</div>
+
+								<div class="form-item" flex="100" flex-gt-sm="40" flex-sm="50">
+									<label>Flag_disp</label>
+									<div flex>
+										<select ui-select2 class="form-control input-sm" name="flag">
+											$!{flagMap}
+										</select>
+									</div>
+								</div>
+
+								<div class="form-item" flex="100" flex-gt-sm="50"
+						flex-sm="50">
+									<label>创建日期</label>
+									<div flex>
+										<input type="text" class="form-control input-sm" name="phone"
+											readonly autocomplete="off" data-auto-update-input="false" ui-daterangepicker>
+									</div>
+								</div>
+
+							</div>
+							<div layout="row" layout-align="center center">
+								<button type="button" class="btn btn-primary btn-sm form-btn"
+									onclick="queryDataList()">
+									<i class="fa fa-search"></i> 查询
+								</button>
+								&nbsp;
+								<button type="button" class="btn btn-primary btn-sm form-btn"
+									onclick="resetButton()">
+									<i class="fi fi-reset"></i> 重置
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="cus-grid" id="grid-wrap">
+			<table id="jqGrid"></table>
+			<div id="jqGridPager"></div>
+		</div>
+	</div>
+	</cus-template>
+
+	${include("/ibp/httl/include/include_js.httl","UTF-8")}
+	<script cus-template-script>
+			var popLayer;
+
+			$(function() {
+				<!-- 树定位 -->
+				//问题词条单选 
+				dropdownTree('question_tree','lastradio','username');
+				
+			var grid = $("#jqGrid").cusGrid({
+					pubToolbars: { //见toolbars示例 examples_docs\custom\toolbars.html
+						id: 'grid-wrap',
+						align: 'right top',
+						actions: [{
+                    icon: 'fi fi-add',
+                    label: '新建',
+                    callback: function () {
+                        //获取选中的行，这是一个数组，多行数组
+                             popLayer = top.FloatingLayers.create({ //top ===顶级窗口滑出div窗口
+                                background: true,
+                                title: {
+                                    text: 'Mydemo - 新 建',
+                                    icon: 'fi fi-add'
+                                },
+                                src:'${appName}/mydemo/insertMydemoView.do'
+                            });
+                            popLayer.show();
+                    }
+                }]
+					},
+					toolbars: { //见toolbars示例 examples_docs\custom\toolbars.html
+						actions: [{
+                    icon: 'fi fi-edit-pencil',
+                    label: '修改',
+                    callback: function () {
+                   			var sel=$("#jqGrid").jqGrid("getGridParam",'selrow');
+							var rowData=$("#jqGrid").jqGrid("getRowData",sel);
+                             popLayer = top.FloatingLayers.create({ //top ===顶级窗口滑出div窗口
+                                background: true,
+                                title: {
+                                    text: 'Mydemo-修改',
+                                    icon: 'fi fi-edit-pencil'
+                                },
+                                src:'${appName}/mydemo/modifyMydemoView.do?id='+rowData.id
+                            });
+                            popLayer.show();
+                    }
+                },{
+							icon: 'fa fa-minus-circle',
+							label: '删除',
+							callback: function() {
+							var sel=$('#jqGrid').jqGrid("getGridParam",'selrow');
+                   			var rowData=$("#jqGrid").jqGrid("getRowData",sel);
+
+								layer.confirm('确定删除吗？', {
+									btn: ['确定', '取消'] //按钮
+								},function(index){
+								$.ajax({
+									url:'${appName}/mydemo/deleteMydemo.ajax',
+					                    		data:{id:rowData.id},
+					                    		dataType:'json',
+					                    		type:'post',
+					                    		success:function(data){
+					                    		 queryDataList();
+					                    		  successMsg("删除成功！");
+					                    		}
+									});
+									layer.close(index);
+								},
+								
+								function(){})
+							}
+						}]
+					},
+					
+					
+					jqGrid: { //jqGrid  http://guriddo.net/  |    http://blog.mn886.net/jqGrid/
+						url: '${appName}/mydemo/queryMydemoList.ajax',
+						mtype: "GET",
+						datatype: "json",
+						page: 1,
+						colNames: ['id','问题词条','password','创建日期','address','状态'],
+						colModel: [
+						{
+							name: 'id',
+							key:true,
+							width: 50,
+							align: "center"
+						}, {
+							name: 'username_disp',
+							width: 75,
+							editable: true,
+							align: "center"
+						},{
+							name: 'password',
+							width: 50,
+							editable: true,
+							align: "center"
+						},{
+							name: 'phone',
+							width: 50,
+							editable: true,
+							align: "center"
+						},{
+							name: 'address',
+							width: 50,
+							editable: true,
+							align: "center"
+						},{
+							name: 'flag_disp',
+							width: 50,
+							editable: true,
+							align: "center"
+						},],
+						//dblclickEdit: false, 开启双击编辑功能 ------------------- 编辑请加此项
+						multiselect: true,
+						autowidth: true,
+						height: 'auto',
+						//height: 250,//可选 'auto' 自适应内容
+						rowNum: 15, //每页显示多少条
+						rowList: [15, 30, 45],
+						altRows: true, //斑马线
+						viewrecords: true, //显示右侧数据信息
+						pager: '#jqGridPager',
+
+						batchDelete: function() { //批量删除
+						var sels = $('#jqGrid').jqGrid('getGridParam', 'selarrrow');
+						var questionkeys ="";
+		                	if(sels.length==0){
+		                    		layer.alert("请选择！");
+		                    		return;
+		                    }
+		                    for(var i=0;i<sels.length;i++){
+		                		var rowData = $("#jqGrid").jqGrid("getRowData", sels[i]);
+                   			
+                   			if(questionkeys==""){
+		                				questionkeys = rowData.id;
+		                			}else{
+		                				questionkeys = questionkeys + "," + rowData.id;
+		                			
+		                		}
+
+		                	}
+							
+							var questionkeysObj = questionkeys.split(",");
+		                	layer.confirm("您确定要删除吗? 请慎重!",
+		                			{btn: ['确定', '取消']}, //按钮
+		                			function(index){//确定按钮
+		                				$.ajax({
+						                  	url:'${appName}/mydemo/deleteAllMydemo.ajax',
+						                  	data:{"selectedQuestionKey":questionkeysObj}, //把选中的ID 传给selectedQuestionKey
+						                  	type:'POST',
+						                  	dataType:'json',
+						                  	traditional: true,
+						                  	success:function(data){ 
+						                		queryDataList();
+						                		  successMsg("删除成功！");
+						                  	}
+						                  }); //end ajax
+		                				layer.close(index);
+		                			},
+		                			function(){} //取消按钮
+		                	)
+						}
+					}
+				});
+
+			});
+			
+			
+			//查询
+			
+			function queryDataList(){ 
+				var postData = $("form").serializeJson();
+				$("#jqGrid").jqGrid('setGridParam',{
+		            postData : postData
+		        }).trigger('reloadGrid');//重新载入
+		        
+			}
+			
+			//重填
+//			function resetButton() {
+//				window.location.reload();
+//			}
+			
+			
+// 			(function(dddd){
+//				alert(dddd)
+//			})("asdfghj")
+//			$(function(){
+//				//
+//			})
+
+
+	
+
+		</script>
+</body>
+
+</html>
+
